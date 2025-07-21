@@ -2,20 +2,23 @@ import re
 
 import fitz
 
+
 def parcing(pdf_path, content_txt_path):
     """Парсит структуру учебника из PDF и текстового файла с содержанием.
-    
+
     Функция анализирует:
     1. Оглавление PDF (через get_toc())
     2. Распознанный текст с номерами страниц
     3. Строит иерархическую структуру разделов и подразделов
-    
+
     Args:
         pdf_path (str): Путь к PDF файлу учебника
-        content_txt_path (str): Путь к текстовому файлу с распознанным содержанием
-        
+        content_txt_path (str): Путь к текстовому файлу с
+        распознанным содержанием
+
     Returns:
-        list: Список словарей с элементами структуры, где каждый элемент содержит:
+        list: Список словарей с элементами структуры, где
+        каждый элемент содержит:
             - id: уникальный идентификатор
             - name: название раздела
             - parent: id родительского раздела (0 для корневых)
@@ -24,7 +27,7 @@ def parcing(pdf_path, content_txt_path):
     next_id = 1
     result = []
     start_pos = 0
-    
+
     content = fitz.open(pdf_path).get_toc()
     with open(content_txt_path, "r") as f:
         text = f.readlines()
@@ -46,8 +49,11 @@ def parcing(pdf_path, content_txt_path):
             for j in range(start_pos, len(text)):
                 if text[j].startswith('\ufeff'):
                     text[j] = text[j].replace('\ufeff', '')
-                string = text[j] if part_string == '' else part_string + text[j] 
-                section_match = re.search(r"^(\d+)\.\s+(.*?)\s*\.+\s*(\d+)\s*$", string)
+                string = text[j] if part_string == '' else part_string + text[
+                    j]
+                section_match = re.search(
+                    r"^(\d+)\.\s+(.*?)\s*\.+\s*(\d+)\s*$",
+                    string)
                 if section_match:
                     num = int(section_match.group(3))
                     if num == end_pos:
@@ -58,9 +64,10 @@ def parcing(pdf_path, content_txt_path):
                         part_string = ''
                         break
                     continue
-                
+
                 part_string = ''
-                part_match = re.search(r"^([А-Яа-яёЁ\s,.\-]+?)\.+\s*(\d+)\s*$", string)
+                part_match = re.search(r"^([А-Яа-яёЁ\s,.\-]+?)\.+\s*(\d+)\s*$",
+                                       string)
                 if part_match:
                     num = int(part_match.group(2))
                     if num < chapter[2] or num >= end_pos:
@@ -84,5 +91,4 @@ def parcing(pdf_path, content_txt_path):
                     else:
                         part_string = part_string + ' '
 
-    
     return result

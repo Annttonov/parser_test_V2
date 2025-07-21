@@ -1,10 +1,10 @@
-import os
 import base64
-import requests
-import time
-from dotenv import load_dotenv
 import json
+import os
+import time
 
+import requests
+from dotenv import load_dotenv
 
 # Загружаем ключи из .env
 load_dotenv()
